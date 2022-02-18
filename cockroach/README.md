@@ -44,6 +44,10 @@ meta信息有多大？ range大小最大是512MB，所以meta的大小由range�
 3. TiDB和CockroachDB为什么底层是range存放，不是hash存储？
 4. 为什么串行化隔离级别需要考虑读写的并发冲突
 5. HLC
+6. Raft 底层是传的rocksdb（LSM）的WAL？
+7. rocksdb难道真的每个KV写入都fsync？
+8. indx是怎么实现的？因为index的key很可能不在range里面。支持btree index only？
+9. 表的元数据也是在rocksdb？怎么防止元数据修改的时候冲突？和表数据冲突解决一样（线性化级别然后client retry来解决冲突，i.e.无锁）？
 
 ## Others
 (optional) PosgreSQL 的SSI （Serializable Snapshot Isolation）的paper可以作为以后研究的candidate
