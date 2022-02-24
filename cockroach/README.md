@@ -91,6 +91,6 @@ index是单独的表，表里可以包含index的column，主键，还可以指�
 ## Followup
 
 三个session：
-1. 串行化隔离级别的实现 https://www.drkp.net/papers/ssi-vldb12.pdf
+1. 串行化隔离级别的实现 https://www.drkp.net/papers/ssi-vldb12.pdf   <下一次讨论topic>
 2. HLC （hybrid-logical clocks）  https://cse.buffalo.edu/tech-reports/2014-04.pdf
 3. DDL解决办法。https://research.google.com/pubs/archive/41344.pdf
