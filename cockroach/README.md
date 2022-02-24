@@ -51,3 +51,46 @@ meta信息有多大？ range大小最大是512MB，所以meta的大小由range�
 
 ## Others
 (optional) PosgreSQL 的SSI （Serializable Snapshot Isolation）的paper可以作为以后研究的candidate
+
+
+# 2月23日讨论总结
+
+## Left Questions on 1月26日 
+### 1. writeIntent和resolveIntent底层的实现，具体操作是什么？tuple级别加tag？还是其他方式？
+writeIntent的底层实现是会产生两个key/value pair，其中一个是真正的key value，另外一个是描述writeIntent。第一个key/value pair的key带时间戳，第二个不带，value里会描述是writeIntent，并指向第一个（真正的）key/value pair。在这个Intent被resolve之前，真正的key/value pair对其他请求是不可见的。在resolve intent的时候，第二个key/value会被删除，所以不会影响真正key/value pair 的使用
+
+### 2. TiDB&CockroachDB底层是key/value存储，在云厂商上部署不友好？怎么实现的？
+可能是基于K8S使用类似于EBS. 比S3存储贵，但是更便捷和性能好。
+
+### 3. TiDB和CockroachDB为什么底层是range存放，不是hash存储？
+ 推测原因一：hash partition更偏好OLAP(e.g. distribution key的hash join）；会有rebalance overhead (e.g. when expand).
+   range适合简单range条件的OLAP，单机就搞定，性能好。 
+ 推测原因二：在进行segment split/merge 处理时，CockroachDB只需要对一个或者两segment进行操作。不会影响其他segment。而hash partition增加一个segment需要更改hash算法，影响较大，而且较难做到一变二。
+ 
+### 4.  为什么串行化隔离级别需要考虑读写的并发冲突
+ 放到下一轮单独讨论。
+ https://www.cockroachlabs.com/blog/serializable-lockless-distributed-isolation-cockroachdb/
+ PostgreSQL的串行化隔离级别有相关论文要看一下。
+ 
+### 5. HLC
+ 单独一个session讨论
+ 
+### 6. Raft 底层是传的rocksdb（LSM）的WAL？
+No. Raft底层传输的是单独的raft log，但是现在似乎raft log会写rocksdb，会有写放大。不知道Pebble解决这个问题否。 WAL是RocksDB自己收到put请求以后做的两阶段的处理，先写WAL，再写key/value。是为了保证单个节点可以实现故障恢复
+
+### 7. rocksdb难道真的每个KV写入都fsync？
+是以事务为单位的。每个rocksdb事务都fsync
+
+### 8. index是怎么实现的？因为index的key很可能不在range里面。支持btree index only？
+index是单独的表，表里可以包含index的column，主键，还可以指定额外的列（很多数据库都是这么做的）。是全局排序的。LSM排序，index实现会很简单。
+
+### 9.表的元数据也是在rocksdb？怎么防止元数据修改的时候冲突？和表数据冲突解决一样（线性化级别然后client retry来解决冲突，i.e.无锁）？
+表的元数据也在rocksdb. 元数据修改冲突单独一个session讨论，可以看MySQL 的online DDL等。另外，Google F1对DDL进行了分阶段操作，在阶段和阶段之间可以并行运行DML语句。
+
+
+## Followup
+
+三个session：
+1. 串行化隔离级别的实现 https://www.drkp.net/papers/ssi-vldb12.pdf
+2. HLC （hybrid-logical clocks）  https://cse.buffalo.edu/tech-reports/2014-04.pdf
+3. DDL解决办法。https://research.google.com/pubs/archive/41344.pdf
