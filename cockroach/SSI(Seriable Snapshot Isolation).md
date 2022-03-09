@@ -52,7 +52,7 @@ Seriable Snapshot Isolation in PostgreSQL https://www.drkp.net/papers/ssi-vldb12
 * SSI比传统的S2PL快很多
 
 ## FollowUp
-下一次讨论内容：CockRoachDB的SSI的实现
+下一次讨论内容：CockRoachDB的SSI的实现. Target Date: 2022.03.22
 
 ## Pending Discussion Topics
 1. HLC （hybrid-logical clocks）  https://cse.buffalo.edu/tech-reports/2014-04.pdf
