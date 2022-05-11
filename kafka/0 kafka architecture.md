@@ -5,9 +5,10 @@
 # Youtube Videos
 1. [Kafka 入门视频](https://www.youtube.com/watch?v=XFqm_ILuhs0&list=PLt1SIbA8guusxiHz9bveV-UHs_biWFegU)
 2. [Kafka Streaming](https://www.youtube.com/watch?v=y9a3fldlvnI)
-3. [Pulsar](https://www.youtube.com/watch?v=vlU9UegYab8)
-4. [Pulsar Basic Concepts](https://www.youtube.com/watch?v=ed5zxfvlT-M)
-5. [Kafka vs Amazon SNS/SQS](https://www.youtube.com/watch?v=ZI5CDsob6i0)
+3. [Plusar Overview](https://www.youtube.com/watch?v=7h7hA7APa5Y)
+4. [Pulsar](https://www.youtube.com/watch?v=vlU9UegYab8)
+5. [Pulsar Basic Concepts](https://www.youtube.com/watch?v=ed5zxfvlT-M)
+6. [Kafka vs Amazon SNS/SQS](https://www.youtube.com/watch?v=ZI5CDsob6i0)
 
 
 # 讨论的Summary 
@@ -52,5 +53,5 @@ Pulsar包括三部分：zookeeper（元信息）、Pulsar Server（计算层）�
 3. 可以实现多租户。 
 4. Pulsar的book keeper可以上面套单独的SQL封装，被查询。
 
-![Pulsar](https://github.com/ictmalili/data-ranger/blob/master/kafka/25%20Pulsar%20Diagrams.png)
+![Pulsar](https://github.com/ictmalili/data-ranger/blob/master/kafka/26%20Pulsar%20Architecture.png)
 ## 有用的截图看本文件夹下其他截图
