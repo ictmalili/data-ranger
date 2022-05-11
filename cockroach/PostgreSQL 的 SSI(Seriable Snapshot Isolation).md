@@ -57,3 +57,17 @@ Seriable Snapshot Isolation in PostgreSQL https://www.drkp.net/papers/ssi-vldb12
 ## Pending Discussion Topics
 1. HLC （hybrid-logical clocks）  https://cse.buffalo.edu/tech-reports/2014-04.pdf
 2. DDL冲突解决办法。https://research.google.com/pubs/archive/41344.pdf
+
+
+
+# 2022年3月30日CockRoachDB的SSI 资料
+https://www.cockroachlabs.com/blog/serializable-lockless-distributed-isolation-cockroachdb/
+https://zhuanlan.zhihu.com/p/85001198
+https://zhuanlan.zhihu.com/p/89915479
+https://zhuanlan.zhihu.com/p/98626684
+https://zhuanlan.zhihu.com/p/102368271
+https://zhuanlan.zhihu.com/p/139551710
+
+
+# 2022年4月20日HLC
+https://cse.buffalo.edu/tech-reports/2014-04.pdf
