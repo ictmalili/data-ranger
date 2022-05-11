@@ -11,13 +11,6 @@
 
 
 # 讨论的Summary 
-## Kafka Fundamental
-Concepts: 
-* Pub/Sub 
-* Topics -> Partitions
-* Producers -> Consumers
-* Brokers
-
 ## Kafka Scenario
 ![企业应用场景](https://github.com/ictmalili/data-ranger/blob/master/kafka/4%20Kafka%20in%20the%20Enterprise%20Architecture.png)
 
@@ -25,6 +18,18 @@ Concepts:
 * Sharding OLTP -> Kafka -> OLAP
 * IOT -> MatrixGate -> OLAP IOT数据拿过来，批量存放，在放到AP系统中
 * Kafka的consumer是pull的模式，不是push
+
+## Kafka Fundamental
+Concepts: 
+* Pub/Sub 
+* Topics -> Partitions
+* Producers -> Consumers
+* Brokers
+
+![基本组成](https://github.com/ictmalili/data-ranger/blob/master/kafka/1%20Kafka%20Ecosystem%20-%20Kafka%20Core.png)
+![Brokers & Topics](https://github.com/ictmalili/data-ranger/blob/master/kafka/6%20Brokers%20%26%20Topics.png)
+![Producers](https://github.com/ictmalili/data-ranger/blob/master/kafka/9%20Producers.png)
+![Consumers](https://github.com/ictmalili/data-ranger/blob/master/kafka/11%20Consumer%20Groups.png)
 
 ## Kafka vs 时序数据库
 时序数据库的查询处理要更加复杂，Kafka上也在向这个方向走，比如做KSQL，但可能不容易做这么成熟
@@ -47,4 +52,5 @@ Pulsar包括三部分：zookeeper（元信息）、Pulsar Server（计算层）�
 3. 可以实现多租户。 
 4. Pulsar的book keeper可以上面套单独的SQL封装，被查询。
 
+![Pulsar](https://github.com/ictmalili/data-ranger/blob/master/kafka/25%20Pulsar%20Diagrams.png)
 ## 有用的截图看本文件夹下其他截图
