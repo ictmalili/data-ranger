@@ -55,3 +55,6 @@ Pulsar包括三部分：zookeeper（元信息）、Pulsar Server（计算层）�
 
 ![Pulsar](https://github.com/ictmalili/data-ranger/blob/master/kafka/26%20Pulsar%20Architecture.png)
 ## 有用的截图看本文件夹下其他截图
+
+# What's Next? 
+2022.05.25 [[SIGMOD+2022]+Photon-+A+Fast+Query+Engine+for+Lakehouse+Systems Reading](https://github.com/ictmalili/data-ranger/blob/master/photon/photon%20architecture.md)
