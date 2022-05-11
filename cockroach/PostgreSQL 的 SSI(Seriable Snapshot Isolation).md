@@ -62,10 +62,15 @@ Seriable Snapshot Isolation in PostgreSQL https://www.drkp.net/papers/ssi-vldb12
 
 # 2022年3月30日CockRoachDB的SSI 资料
 https://www.cockroachlabs.com/blog/serializable-lockless-distributed-isolation-cockroachdb/
+
 https://zhuanlan.zhihu.com/p/85001198
+
 https://zhuanlan.zhihu.com/p/89915479
+
 https://zhuanlan.zhihu.com/p/98626684
+
 https://zhuanlan.zhihu.com/p/102368271
+
 https://zhuanlan.zhihu.com/p/139551710
 
 
