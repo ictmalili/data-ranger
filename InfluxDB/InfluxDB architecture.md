@@ -15,8 +15,8 @@ Measurements & Buckets & Retention setting
 *  过期数据删除很重要，因为有的数据是有时效性的，或者可以将就的数据保持成较高维度的数据，比如之前是每10s收集一次，对较久的数据可以变成每分钟的统计信息
 * InfluxDB支持使用InfluxQL跨bucket的查找，支持pivot，join等方法。
 
-
-![Measurements & Tags & Fields]（https://github.com/ictmalili/data-ranger/blob/master/InfluxDB/Measurement%20%26%20Tag%20%26%20Fields.png）
+Measurements & Tags & Fields
+![Measurements & Tags & Fields](https://github.com/ictmalili/data-ranger/blob/master/InfluxDB/Measurement%20%26%20Tag%20%26%20Fields.png)
 * 在Measurement内部，有不同的列，必不可少的是时间列，再有比如Tag列，Field列。
 * 可以将Tag列看作是带索引的列，因为查找起来更快。
 
