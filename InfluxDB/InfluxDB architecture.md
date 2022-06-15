@@ -1,3 +1,6 @@
+# 阅读材料
+https://docs.influxdata.com/influxdb/v2.2/reference/key-concepts/ 
+
 
 # InfluxDB Data Model
 https://youtu.be/3qTTqsL27lI 
