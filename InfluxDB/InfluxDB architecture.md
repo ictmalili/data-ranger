@@ -38,6 +38,12 @@ https://docs.influxdata.com/influxdb/v2.2/reference/key-concepts/design-principl
 也可以通过Telegraf agent来进行处理，Telegraf agent可以部署在device上，也可以部署在gateway上
 Telegraf agent或者library有transform data的功能，比如转换格式 （MQTT？），网络链路有问题时作backoff等。
 
+# InfluxDB 数据查询
+有两种方式Flux和InfluxQL
+Flux 查询有两种：
+1. basic 查询，比如指定data source、time range和data filters。 
+2. Flux functions。定义了系列方法，比如mean(),window(),duplicate(),aggregateWindows, group, sort, limit, map, histograms, fills(填充NULL值）。常用的一些聚合类操作。
+InfluxQL是基于InfluxDB 1.x的model的。现在InfluxDB最新是2.2版本。版本2和1的区别在于版本1的database&retention policy对应版本2里的buckets（关系数据库的database）。
 
 # InfluxDB 底层数据模型 TSM
 https://youtu.be/C5sv0CtuMCw
@@ -57,8 +63,8 @@ https://youtu.be/C5sv0CtuMCw
 
 # InfluxDB的存储引擎
 存储数据分为几步：
-1.写WAL Log，fsync到磁盘
-2.数据更新写到Cache
-3.数据同步到disk。
-4.返回结果给用户。
-5.<异步> 同步到disk以后，WAL Log可以truncate，cache里数据可以删除 （Question：一定会删除吗？） 
+1. 写WAL Log，fsync到磁盘
+2. 数据更新写到Cache
+3. 数据同步到disk。
+4. 返回结果给用户。
+5. <异步> 同步到disk以后，WAL Log可以truncate，cache里数据可以删除 （Question：一定会删除吗？） 
