@@ -31,3 +31,9 @@ https://docs.influxdata.com/influxdb/v2.2/reference/key-concepts/design-principl
 * Point 单点的数据没有ID号，直接用时间标识，因为InfluxDB更多是对数据做聚合处理
 * 重复的数据 采用直接覆盖的方式。认为相同时间点的数据发过来就是冗余数据
 
+# InfluxDB 数据写入
+![Ingest Data to InfluxDB](https://github.com/ictmalili/data-ranger/blob/master/InfluxDB/InfluxDB-Ingest%20Data.png)
+支持device直接写或者是通过Gateway写入。也支持云上机器写入
+提供REST API，有library支持12种编程语言
+也可以通过Telegraf agent来进行处理，Telegraf agent可以部署在device上，也可以部署在gateway上
+Telegraf agent或者library有transform data的功能，比如转换格式 （MQTT？），网络链路有问题时作backoff等。
