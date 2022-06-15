@@ -37,3 +37,28 @@ https://docs.influxdata.com/influxdb/v2.2/reference/key-concepts/design-principl
 提供REST API，有library支持12种编程语言
 也可以通过Telegraf agent来进行处理，Telegraf agent可以部署在device上，也可以部署在gateway上
 Telegraf agent或者library有transform data的功能，比如转换格式 （MQTT？），网络链路有问题时作backoff等。
+
+
+# InfluxDB 底层数据模型 TSM
+https://youtu.be/C5sv0CtuMCw
+面向用户的模型和TSM模型的对比（没有Tag的情况）
+![TSM 2 series:dimension & field](https://github.com/ictmalili/data-ranger/blob/master/InfluxDB/InfluxDB-Internal%20TSM%20-%202%20Series(measurement%2Bfield).png)
+
+底层存储在TSM里存储是以列为单位按series来进行存储的，每个series的key是measurement+field，存储的内容是按列存储的，存放时间和值，值按时间排序。
+上图例子里有2个series，就是measurement+对应的field
+
+面向用户的模型和TSM模型的对比（有Tag的情况）
+![TSM 4 series:dimension & field & tag](https://github.com/ictmalili/data-ranger/blob/master/InfluxDB/InfluxDB%20-%20Internal%20TSM%20-%204%20series%20(measurement%2Btag%2Bfield).png)
+
+如果有Tag标识，会将每个Tag的值和field作为单独series进行存放
+上面例子中Tag是location，location一共有两个可取值，所以series数目乘以2。为4个series
+
+如果Tag设计不好，每个Tag都是单一值，存储series可能会很多 （Question：对于主键经常查询的情况是否需要存成Tag呢？那样就会有非常多的series了）
+
+# InfluxDB的存储引擎
+存储数据分为几步：
+1.写WAL Log，fsync到磁盘
+2.数据更新写到Cache
+3.数据同步到disk。
+4.返回结果给用户。
+5.<异步> 同步到disk以后，WAL Log可以truncate，cache里数据可以删除 （Question：一定会删除吗？） 
