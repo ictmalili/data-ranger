@@ -5,6 +5,9 @@ https://docs.influxdata.com/influxdb/v1.8/concepts/storage_engine/
 
 https://blog.fatedier.com/2016/08/05/detailed-in-influxdb-tsm-storage-engine-one/
 
+InfluxDB Storage Engine Internals | Metamarkets >>https://www.youtube.com/watch?v=rtEalnKT25I
+
+
 # InfluxDB Data Model
 https://youtu.be/3qTTqsL27lI 
 
