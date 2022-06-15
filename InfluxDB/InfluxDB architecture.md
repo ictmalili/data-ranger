@@ -23,5 +23,11 @@ Measurements & Tags & Fields
 * 在Measurement内部，有不同的列，必不可少的是时间列，再有比如Tag列，Field列。
 * 可以将Tag列看作是带索引的列，因为查找起来更快。
 
-
+# InfluxDB 设计理念
+https://docs.influxdata.com/influxdb/v2.2/reference/key-concepts/design-principles/
+* Update/Delete被限制。 因为时序数据很少被Update，所以没有conflict update的支持（？） 只能delete旧数据（没有并发的写入操作的数据）
+* Read/Write 按最终一致性处理，所以有时读不到刚流进来的数据
+* Schemaless design 无需实现定义schema，只需要定义这个measurement名字即可（表名）
+* Point 单点的数据没有ID号，直接用时间标识，因为InfluxDB更多是对数据做聚合处理
+* 重复的数据 采用直接覆盖的方式。认为相同时间点的数据发过来就是冗余数据
 
