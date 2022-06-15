@@ -1,6 +1,8 @@
 # 阅读材料
 https://docs.influxdata.com/influxdb/v2.2/reference/key-concepts/ 
+
 https://docs.influxdata.com/influxdb/v1.8/concepts/storage_engine/
+
 https://blog.fatedier.com/2016/08/05/detailed-in-influxdb-tsm-storage-engine-one/
 
 # InfluxDB Data Model
@@ -72,19 +74,25 @@ https://youtu.be/C5sv0CtuMCw
 
 # TSM vs LSM
 TSM比LSM好的地方在于它提出了shard的概念，根据时间将数据分成不同的分片，这样在进行批量delete过期数据的时候性能会好，因为只需要删除相应的chunk即可。反观LSM，它在删除数据时需要先做delete marker，再compact数据，相对复杂。
+
 另外，InfluxDB还提到LSM有文件句柄过多的问题，为什么TSM能解决？ 也许是TSM层数比较少（4 vs 6），也有可能数据在shard中打散，需要打开的数据不需要向后倒更深层时的tree，但TSM也还是存在文件数目过多的问题。
 
 # InfluxDB vs TimeScale/TDEngine
-TimeScale是基于PostgreSQL直接构建的，上面通过加额外的一层HyperTable做相应的处理，InfluxDB重写的存储层。关于是否有必要重写存储系统，其实也要看是否在开源上做能达到需求，如果能打到，也是可以的。TimeScale说是在更大规模的数据上（比如更多的传感器），会有更好的性能，所以是否重写引擎就一定快也是不好说的。
+TimeScale是基于PostgreSQL直接构建的，上面通过加额外的一层HyperTable做相应的处理，InfluxDB重写的存储层。
+
+关于是否有必要重写存储系统，其实也要看是否在开源上做能达到需求，如果能打到，也是可以的。TimeScale说是在更大规模的数据上（比如更多的传感器），会有更好的性能，所以是否重写引擎就一定快也是不好说的。
 
 # 数据如何打到时序数据库
-对于中小规模的数据，可以将设备通过client端或者gateway打过来，当然client端或是gateway可以有batch处理、backoff策略等处理来减轻对数据库的压力。如果对于较大的数据，可以考虑中间加入一层中间件比如Kafka来进行消峰的操作，降低对数据库的影响。
+对于中小规模的数据，可以将设备通过client端或者gateway打过来，当然client端或是gateway可以有batch处理、backoff策略等处理来减轻对数据库的压力。
+
+如果对于较大的数据，可以考虑中间加入一层中间件比如Kafka来进行消峰的操作，降低对数据库的影响。
 
 # 时序数据库和实时流处理一样吗？
 时序数据库是要求数据进行持久化存储的，实时流处理可能拿到的是更小的时间窗口，或者是它有实时更新的物化视图，当数据流过时，视图自动变化。时序数据库对于数据的时效性可能要求并不是那么高，但存储的数据可能会更久一些。
 
 # 时序数据库一定快于关系数据库上存储时序数据吗？
 时序数据库更多是做数据的聚集分析，封装了自己的很多方法，基于时间维度的aggregation分析等，如果关系数据库上来实现，会相对复杂，所以从易用性的角度，时序数据库更强一些。
+
 至于时序数据库底层的实现，通过关系数据库来做也未尝不可。可能对于有些大宽表的处理，要做额外处理，比如PostgreSQL列的上限是1600.
 
 # 下次讨论话题
