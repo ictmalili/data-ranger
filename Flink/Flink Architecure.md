@@ -65,9 +65,34 @@ Checkpoint barrier有自己在datastream中的offset，所以按照offset进行�
 打快照时，Job manager会trigger task manager进行快照，task manager会把信息存在持久化snapshot store里。（HDFS/S3）
 ![Flink Snapshot Processing](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20snapshot%20processing.png)
 
+## 资源管理
 资源管理有两种方式
 1. 静态资源管理。 每个task manager向job manager发送注册信息。job manager收到client请求后，会根据task manager的注册信息生成execution graph（主要是task manager数目，决定将数据拆成几份）
 ![Static Resource Provisioning](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20static%20resource%20provisioning.png)
 ![Static Resource Provisioning - 2](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20static%20resource%20provisioning%20-%20generating%20execution%20graph.png)
 2. 动态资源管理。client向job manager提交任务，job manager里的resource manager向YARN/K8S请求资源，拿到资源后会去部署task manager。
 ![Dynamic Resource Provisioning](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20dynamic%20resource%20provisioning%20-%20yarn:k8s.png)
+
+## 部署架构
+![Flink Deployment Model](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20Flink%20Deployment%20Model.png)
+
+## Job Manager的HA
+Job Manager是单点，HA是通过将Job metadata放在Zookeeper里完成。如果Job Manager出现故障，新启动的可以从Zookeeper里拿信息
+![Job Manager HA](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20Flink%20Job%20Manager%20High%20Availability.png)
+
+# Flink对时间的处理
+主要是Event Time和Process Time。Event Time是指Event在设备上生成的时间，处理起来是有可以保证正确结果的。processing time每次处理时间都不一样。
+![Notion of Time](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20notion%20of%20time.png)
+基于Event Time处理带来的一个问题是Event到达Flink Opeartor处理的时间可能是乱序的。就需要考虑如何保证一定时间内的event能够会攒在一起处理
+Flink有time window的概念，先根据time分成几部分，比如10s为一个time window，来把event打散。
+
+但是怎么保证一个timewindow里的event完全到齐了？引入了watermark的概念。watermark到来，在它以前的event可以认为都处理完了。
+watermark可以人为加入，也可以通过event id来设置，比如设定当前eventid-6就是watermark。
+![WaterMark](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20watermark.png)
+
+watermark引入了，但也不能保证在它之前的event都处理完了。但如果后续的late event怎样去处理？几种不同
+方案：可以丢弃，也可以选允许最大延迟的多大
+![WaterMark and Late Events](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20late%20events.png)
+
+![Time Summary](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20time%20impact.png)
+
