@@ -1,6 +1,8 @@
 # 阅读材料
 https://flink.apache.org/
+
 https://nightlies.apache.org/flink/flink-docs-release-1.15/zh/docs/learn-flink/overview/ 
+
 https://www.youtube.com/watch?v=ZU1r7uEAO7o&list=PLaDktj9CFcS9YAaJ4bKWMWpjptudLr782
 
 # Flink Basic
@@ -96,3 +98,6 @@ watermark引入了，但也不能保证在它之前的event都处理完了。但
 
 ![Time Summary](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20time%20impact.png)
 
+# Exactly Once的处理
+## Transaction Sink 两阶段提交
+question：transaction ID怎么生成的？
