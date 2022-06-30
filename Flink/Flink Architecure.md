@@ -99,5 +99,119 @@ watermark引入了，但也不能保证在它之前的event都处理完了。但
 ![Time Summary](https://github.com/ictmalili/data-ranger/blob/master/Flink/graph%20-%20time%20impact.png)
 
 # Exactly Once的处理
+Flink Exactly-once实现原理解析 https://zhuanlan.zhihu.com/p/266620519
+https://blog.51cto.com/u_14222592/2892647
+
+## 分布式快照/Checkpoint （Barrier+异步+增量）
+
+* checkpoint vs savepoint： checkpoint是系统自动trigger，每隔一段时间打一次，比如10s。savepoint是用户/应用程序trigger的
+
+* checkpoint的实现通过在Event flow里引入Barrier（特殊的event marker），当barrier流到不同的operator时各自进行状态的持久化，大家都完成以后认为全局提交。
+
+* 分布式快照是为了在多个不同有状态的operator之间（可能是一组节点对不同数据子集执行同一个operator，或者是多个operator）达到全局一致，才引入的。
+
+* 如果一个flink对应多个流，会快流等慢流，等大家barrier都到了再把状态写出去。
+
 ## Transaction Sink 两阶段提交
-question：transaction ID怎么生成的？
+实现思想：构建的事务对应着 checkpoint，等到 checkpoint 真正完成的时候，才把所有对应的结果写入 sink 系统中
+
+实现方式
+
+1）预写日志（WAL）：把结果数据先当成状态保存，然后在收到 checkpoint 完成的通知时，一次性写入 sink 系统。
+缺点：做不到真正意义上的Exactly-once，写到一半时挂掉可能重复写入。
+
+2）两阶段提交（2PC）：
+* 对于每个 checkpoint，sink 任务会启动一个事务，并将接下来所有接收的数据添加到事务里
+* 然后将这些数据写入外部 sink 系统，但不提交它们，这时只是“预提交”
+* 当它收到 checkpoint 完成的通知时，它才正式提交事务，实现结果的真正写入
+* 这种方式真正实现了 exactly-once，它需要一个提供事务支持的外部 sink 系统。
+
+
+Flink 中两阶段提交的实现方法被封装到了 TwoPhaseCommitSinkFunction 这个抽象类中，我们只需要实现其中的beginTransaction、preCommit、commit、abort 四个方法就可以实现“精确一次”的处理语义。
+
+1. beginTransaction，在开启事务之前，会在目标文件系统的临时目录中创建一个临时文件，在处理数据时将数据写入这个文件里面。
+2. preCommit，在预提交阶段，将内存中缓存的数据刷写（flush）到文件，然后关闭文件。还将为属于下一个检查点的任何后续写入启动新事物
+3. commit，在提交阶段，将预提交写入的临时文件移动到真正的目标目录中，这代表着最终的数据会有一些延迟；
+4. abort，在中止阶段，我们删除临时文件。
+
+
+## Exact Once
+是通过分布式快照+两阶段提交实现的
+（question：transaction ID怎么生成的？）
+
+两阶段提交的实现：
+1. 一旦 Flink 开始做 checkpoint 操作，那么就会进入 pre-commit 阶段，同时 Flink JobManager 的Coordinator会将检查点 Barrier 注入数据流中 ；
+2. 当所有的 barrier 在算子中成功进行一遍传递，并完成快照后，则 pre-commit 阶段完成；
+3. 等所有的算子完成“预提交”，就会发起一个commit“提交”动作，但是任何一个“预提交”失败都会导致 Flink 回滚到最近的 checkpoint；
+4. pre-commit 完成，必须要确保 commit 也要成功，上图中的 Sink Operators 和 Kafka Sink 会共同来保证。
+
+Exact Once对外部系统有要求（source和target），不一定所有都能实现exact once。他要求source能够重新传数据（数据有一定存放能力，可以重放），target能够实现幂等（相同数据多次执行结果一样）。
+
+Flink目前支持的精确一次source列表如下表所示，你可以使用对应的connector来实现对应的语义要求：
+
+数据源	语义保证	备注
+
+Apache kafka	exactly once	需要对应的Kafka版本
+
+AWS Kinesis Streams	exactly once	 
+
+RabbitMQ	at most once（v0.1）/ exactly once（v1.0）	 
+
+Twitter Streaming API	at most once	 
+
+Collections	exactly once	 
+
+Files	exactly once	 
+
+Sockets	at most once	 
+
+如果需要实现真正的“端到端精确一次语义”，则需要sink的配合，目前Flink支持的列表如下所示：
+
+写入目标	语义保证	备注
+
+HDFS rolling sink	exactly once	依赖 Hadoop 版本
+
+Elasticsearch	at least once	 
+
+Kafka producer	at least once / exactly once	需要 Kafka 0.11 及以上
+
+Cassandra sink	at least once / exactly once	幂等更新
+
+AWS Kinesis Streams	at least once	 
+
+File sinks	at least once	 
+
+Socket sinks	at least once	 
+
+Standard output	at least once	 
+
+Redis sink	at least once
+
+# Off-Cycle 讨论
+## 两阶段提交
+两阶段提交 （need confirm）
+1. 参与者完成本地操作，进入prepare模式，发送给协调者
+2. 协调者收到所有参与者的消息，进入commit模式，会把自己本身的transaction状态置为commit，然后给各个参与者发指令。
+3. 参与者收到协调者发送指令，执行本地commit模式。
+4. 如果参与者在第2步以后失败，故障重启后应该会向协调者要状态，再继续进行本地commit。（协调者为中心状态存储者）
+
+Greenplum在故障恢复时，没有重新向协调者要状态的过程，协调者会重建Gang，给各个参与者发送commit信息。 （@chunling，please confirm）
+
+## PostgreSQL的WAL日志写入问题
+PostgreSQL中有WAL，防止数据页由操作系统写出时不完全（数据页大小大于操作系统向磁盘写数据单元大小），在每次checkpoint以后的新WAL里会加入更改数据页的全部信息。如果频繁更改，频繁刷checkpoint，会带来写放大问题（GaussDB就是这么做的）
+
+另外一个问题是：WAL写数据页就不担心写坏吗？比如事务T1和事务T2都是写数据页P1，事务T1在前，在flush以后数据页P1写入成功，事务T2在后，写数据页P1如果发生失败，会不会带来数据页1的后续读取出问题？
+
+Answer：应该不会，如果页面在前面没有整个页的checksum的话。每个事务可以有自己的元信息，事务T1的元信息成功写入了。WAL是append-only的，所以事务T2的信息是在后面的，出错也是T2出错。
+
+再一个问题：如果一个调用fsync中部分成功，部分失败，后续故障恢复以后会不会有问题？因为fsync并不是原子性操作，而磁盘原子单位为512字节，fsync会把要写的内容乱序分发，并行写出。这样有可能会带来page的前面一个512字节失败，后面的几KB是成功的。如果fsync对应的是事务的组提交，会怎样？如果后续数据库需要故障恢复，再写同一个page会怎么办？
+
+Answer：fsync失败，所有事务都失败，都回滚，问题不大。如果后续数据库故障恢复，遇到page前面的失败以后，应当把WAL log文件对应的后续的所有页面都置0，这样可以避免这个情况出现：恢复后新的事务正好塞满512字节对应的空洞，之前的成功的几KB能够读，但他们对应的事务已经被回滚。带来的问题是，如果WAL log（redo log）较长，置空操作耗时。 这也没办法。
+
+
+# 下次讨论主题
+继续探讨流失数据处理、流批一体等架构 （2022年7月13日）
+1. Lambda & Kappa架构
+2. 流批一体、流处理特点
+3. yMatrix/Greenplum在流处理中的位置
+
