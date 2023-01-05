@@ -14,8 +14,8 @@
 11. 2022.06.30 -> [流处理框架Flink](https://github.com/ictmalili/data-ranger/blob/master/Flink/Flink%20Architecure.md)
 12. 2022.07.19 -> [Lambda & Kappa 架构、流批一体、流处理特点](https://www.peerislands.io/data-processing-lambda-vs-kappa-architectures-and-apache-beam/) (本次及以下讨论内容待整理)
 13. 2022.08.03 -> [GaussDB UStore 存储引擎](https://blog.csdn.net/GaussDB/article/details/119168969?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522165899341416782390596919%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&request_id=165899341416782390596919&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2%7Eblog%7Efirst_rank_ecpm_v1%7Erank_v31_ecpm-1-119168969-null-null.nonecase&utm_term=ustore&spm=1018.2226.3001.4450)
-14. 2022.08.17 -> [ClickHouse](https://www.zhihu.com/column/c_1384650064271351808 https://zhuanlan.zhihu.com/p/397808979)
-15. 2022.09.28 -> [Redis/Pulsar]
+14. 2022.08.17 -> [ClickHouse](https://www.zhihu.com/column/c_1384650064271351808) [存储引擎](https://zhuanlan.zhihu.com/p/397808979)
+15. 2022.09.28 -> Redis/Pulsar
 16. 2022.10.12 -> [DragonFly](https://github.com/dragonflydb/dragonfly) [DashTable in DragonFly](https://github.com/dragonflydb/dragonfly/blob/main/docs/dashtable.md)
 16. 2022.10.26 -> [HeatWave](https://www.oracle.com/a/ocom/docs/mysql-database-service-with-heatwave.pdf)
 17. 2022.11.16 -> [Oceanbase](https://vldb.org/pvldb/vol15/p3385-xu.pdf)
